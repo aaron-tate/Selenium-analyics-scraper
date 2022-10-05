@@ -30,10 +30,16 @@ if __name__ == "__main__":
   print('parsing the first topic')
   #info being parsed: rank in top ten, title, news outlet, short description, and thumbnail
 
-  item = items[3]
+  item = items[1]
   title_CLASS= item.find_element(By.TAG_NAME, 'a')
   title = title_CLASS.text
-  url = title_CLASS.get_attribute('href')
+
+  description_tag = item.find_element(By.CLASS_NAME, 'summary-text')
+  description = description_tag.text 
+
+  source_tag = item.find_element(By.CLASS_NAME, 'source-and-time')
+  source = source_tag.text
   
   print('Title:', title)
-  print('URL:', url)
+  print('Short Description:', description)
+  print('', source)
