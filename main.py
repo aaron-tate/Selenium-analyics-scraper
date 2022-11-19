@@ -1,3 +1,4 @@
+import pandas as pd
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
@@ -16,9 +17,25 @@ def get_driver():
 
 def get_items(driver):
   driver.get(TRENDING_URL)
-  T_ITEMS_DIV_TAG = 'md-list'
+  T_ITEMS_DIV_TAG = 'feed-item'
   items = driver.find_elements(By.TAG_NAME, T_ITEMS_DIV_TAG)
   return items
+
+def parse_item(item):
+  title_CLASS = item.find_element(By.TAG_NAME, 'a')
+  title = title_CLASS.text
+  
+  source_tag = item.find_element(By.CLASS_NAME, 'source-and-time')
+  source = source_tag.text
+
+  description_tag = item.find_element(By.CLASS_NAME, 'summary-text')
+  description = description_tag.text
+
+  return{
+    'Title:': title,
+    'source': source,
+    'Short Description': description
+  }
 
 if __name__ == "__main__":
   print('Creating Driver')
@@ -29,23 +46,12 @@ if __name__ == "__main__":
 
   print(f'Found {len(items)} items')
 
-  print('parsing the first topic')
-  #info being parsed: rank in top ten, title, news outlet, short description, and thumbnail
+  print('parsing the top topics')
+  items_data = [parse_item(item) for item in items[:12]]
 
-  item = items[1]
-  title_CLASS = item.find_element(By.TAG_NAME, 'a')
-  title = title_CLASS.text
+  print(items_data)
 
-  description_tag = item.find_element(By.CLASS_NAME, 'summary-text')
-  description = description_tag.text
-
-  URL_tag = item.find_element(By.XPATH, "//md-list[1]/feed-item/ng-include/div/div/div[1]/div[2]/div[2]/div[1]/div[1]/a")
-  url = URL_tag.get_attribute('href')
-
-  source_tag = item.find_element(By.CLASS_NAME, 'source-and-time')
-  source = source_tag.text
-
-  print('Title:', title)
-  print('Short Description:', description)
-  print('', source)
-  print('', url)
+  print('Saving data to a .csv')
+  topics_df = pd.DataFrame(items_data)
+  print(topics_df)
+  topics_df.to_csv('trendingtopics.csv', index=None)
