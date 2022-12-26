@@ -24,6 +24,9 @@ def get_items(driver):
 def parse_item(item):
   title_CLASS = item.find_element(By.TAG_NAME, 'a')
   title = title_CLASS.text
+
+  imageurl_class = item.find_element(By.CLASS_NAME, 'feed-item-image-wrapper')
+  imageurl = imageurl_class.find_element(By.TAG_NAME, 'img').get_attribute('ng-src')
   
   source_tag = item.find_element(By.CLASS_NAME, 'source-and-time')
   source = source_tag.text
@@ -31,10 +34,16 @@ def parse_item(item):
   description_tag = item.find_element(By.CLASS_NAME, 'summary-text')
   description = description_tag.text
 
+  url_tag = item.find_element(By.LINK_TEXT, description)
+  url = url_tag.get_attribute('href')
+  
+  
   return{
     'Title:': title,
     'source': source,
-    'Short Description': description
+    'Short Description': description,
+    'url': url,
+    'imageurl': imageurl
   }
 
 if __name__ == "__main__":
